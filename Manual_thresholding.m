@@ -4,35 +4,10 @@ function [CODEX,CyCIF,mIHC] = Manual_thresholding(CODEX,CyCIF,mIHC,intersect_new
 % Scatter size
 size_scatter = 0.7;
 
-% Load masks
-% CODEX
-mask_codex =...
-    double(imread('/Users/denisschapiro/Desktop/TNP_Data/TNP_pilot_codex/segmentation/PilotTonsil_5_z08/cellMask.tif'));
-
-% Create RGB
-image =zeros(300,400,3);
-image(:,1:100,1)=0.5;
-image(:,101:200,1)=1;   %Red (maximum value)
-image(1:100,:,2)=rand(100,400);  %Green
-figure, imshow(image)
-
-
-image_test = zeros(size(mask_codex,1),size(mask_codex,2),3);
-
-cell_ids = CODEX.CellID(CODEX.CD20_pos == 1);
-
-for i=1:size(cell_ids)
-    [row,col] = find(mask_codex==cell_ids(i));
-    image_test(row,col,1) = 65535;
-end
-
-figure, imshow(image_test)
-
-
 %% CD20, PanCK, CD8 and CD45
 % CD20
 %histogram(log(tSNE_codex_data(:,1)));
-CODEX.CD20_pos = (log(CODEX.CD20)>8.2);
+CODEX.CD20_pos = (log(CODEX.CD20)>7.9);
 CODEX_CD20_pos_index = find(CODEX.CD20_pos);
 
 % Image = zeros(size(mask_codex,1),size(mask_codex,2),3);

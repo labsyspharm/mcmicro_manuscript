@@ -29,9 +29,9 @@ scatter(mIHC.Y_centroid(intersect_new_mIHC),mIHC.X_centroid(intersect_new_mIHC).
 
 %% Create tSNE
 % Select markers of interest
-tSNE_codex_data =   [CODEX.CD20,CODEX.PanCK,CODEX.CD8,CODEX.CD45];
-tSNE_cycif_data =   [CyCIF.CD20_488,CyCIF.Keratin_570,CyCIF.CD8a_488,CyCIF.CD45_647];
-tSNE_mIHC_data =    [mIHC.CD20_cellMask,mIHC.PANCK_cellMask,mIHC.CD8_cellMask,mIHC.CD45_cellMask];
+tSNE_codex_data =   [CODEX.CD20,CODEX.PanCK,CODEX.CD8];
+tSNE_cycif_data =   [CyCIF.CD20_488,CyCIF.Keratin_570,CyCIF.CD8a_488];
+tSNE_mIHC_data =    [mIHC.CD20_cellMask,mIHC.PANCK_cellMask,mIHC.CD8_cellMask];
 
 % Select ROIs 
 tSNE_cycif_data_ROI = tSNE_cycif_data(intersect_new_cycif,:);
@@ -51,7 +51,9 @@ tSNE_mIHC_data_ROI_norm = normalize(tSNE_mIHC_data_ROI);
 
 tSNE_combine_norm = [tSNE_codex_data_norm;tSNE_cycif_data_ROI_norm;tSNE_mIHC_data_ROI_norm];
 
-[tsne_xy_norm,y_norm] = tsne(tSNE_combine_norm(:,1:3));
+subsample_rand = randperm(size(tSNE_combine_norm,1));
+
+[tsne_xy_norm,y_norm] = tsne(tSNE_combine_norm(subsample_rand(1:10000),1:3));
 
 %% Visualize tSNE
 figure()
@@ -63,12 +65,13 @@ scatter(tsne_xy(find(tSNE_code==2),1),tsne_xy(find(tSNE_code==2),2),[],[0.25, 0.
 hold off
 
 % Normalized
+tSNE_code_subsample = tSNE_code(subsample_rand(1:10000));
 figure()
-scatter(tsne_xy_norm(find(tSNE_code==0),1),tsne_xy_norm(find(tSNE_code==0),2),[],[0, 0.4470, 0.7410]);
+scatter(tsne_xy_norm(find(tSNE_code_subsample==0),1),tsne_xy_norm(find(tSNE_code_subsample==0),2),[],[0, 0.4470, 0.7410]);
 hold on
-scatter(tsne_xy_norm(find(tSNE_code==1),1),tsne_xy_norm(find(tSNE_code==1),2),[],[0.4940, 0.1840, 0.5560]);
+scatter(tsne_xy_norm(find(tSNE_code_subsample==1),1),tsne_xy_norm(find(tSNE_code_subsample==1),2),[],[0.4940, 0.1840, 0.5560]);
 hold on
-scatter(tsne_xy_norm(find(tSNE_code==2),1),tsne_xy_norm(find(tSNE_code==2),2),[],[0.25, 0.25, 0.25]);
+scatter(tsne_xy_norm(find(tSNE_code_subsample==2),1),tsne_xy_norm(find(tSNE_code_subsample==2),2),[],[0, 0, 0]);
 hold off
 
 %% Manual cell type
@@ -78,11 +81,17 @@ hold off
 tSNE_code_CD20 = [CODEX.CD20_pos == 1;CyCIF.CD20_pos(intersect_new_cycif)==1;...
     mIHC.CD20_pos(intersect_new_mIHC)==1];
 
+tSNE_code_CD20_subsample = tSNE_code_CD20(subsample_rand(1:10000));
+
 tSNE_code_Keratin = [CODEX.Keratin_pos == 1;CyCIF.Keratin_pos(intersect_new_cycif) ==1;...
     mIHC.Keratin_pos(intersect_new_mIHC)==1];
 
+tSNE_code_Keratin_subsample = tSNE_code_Keratin(subsample_rand(1:10000));
+
 tSNE_code_CD8 = [CODEX.CD8_pos == 1;CyCIF.CD8_pos(intersect_new_cycif) ==1;...
     mIHC.CD8_pos(intersect_new_mIHC)==1];
+
+tSNE_code_CD8_subsample = tSNE_code_CD8(subsample_rand(1:10000));
 
 % Visualize cell types on tSNE
 figure()
@@ -98,14 +107,12 @@ hold off
 figure()
 scatter(tsne_xy_norm(:,1),tsne_xy_norm(:,2),[],[0.8 0.8 0.8]);
 hold on
-scatter(tsne_xy_norm(find(tSNE_code_CD20),1),tsne_xy_norm(find(tSNE_code_CD20),2),[],[0.9290 0.6940 0.1250]);
+scatter(tsne_xy_norm(find(tSNE_code_CD20_subsample),1),tsne_xy_norm(find(tSNE_code_CD20_subsample),2),[],[0.9290 0.6940 0.1250]);
 hold on
-scatter(tsne_xy_norm(find(tSNE_code_Keratin),1),tsne_xy_norm(find(tSNE_code_Keratin),2),[],[0.4660 0.6740 0.1880]);
+scatter(tsne_xy_norm(find(tSNE_code_Keratin_subsample),1),tsne_xy_norm(find(tSNE_code_Keratin_subsample),2),[],[0.4660 0.6740 0.1880]);
 hold on
-scatter(tsne_xy_norm(find(tSNE_code_CD8),1),tsne_xy_norm(find(tSNE_code_CD8),2),[],[0.6350 0.0780 0.1840]);
+scatter(tsne_xy_norm(find(tSNE_code_CD8_subsample),1),tsne_xy_norm(find(tSNE_code_CD8_subsample),2),[],[0.6350 0.0780 0.1840]);
 hold off
-
-scatter(tsne_xy_norm(find(tSNE_code_Keratin),1),tsne_xy_norm(find(tSNE_code_Keratin),2),[],tSNE_code_CD20)
 
 % Plot cell types
 % figure()
